@@ -1,4 +1,5 @@
 import 'package:dummy_sources/Todos/todoList.dart';
+import 'package:dummy_sources/splashScreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +17,7 @@ class Todos extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const TodoList(title: 'Todos'),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

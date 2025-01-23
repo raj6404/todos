@@ -68,15 +68,42 @@ class _TodoListState extends State<TodoList> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 Todo todo = todos[index];
+
+                // Card with a shadow effect for a modern look
                 return Card(
-                  color: todo.completed ? Colors.green[100] : Colors.red[100],
+                  color: todo.completed ? Colors.green[50] : Colors.red[50],
+                  elevation: 4,  // Shadow effect for better separation
                   margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),  // Rounded corners for the card
+                  ),
                   child: ListTile(
-                    title: Text(todo.title),
-                    subtitle: Text('User ID: ${todo.userId}'),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),  // Add padding inside the tile
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'User ID: ${todo.userId}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],  // Subtle gray color
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 8),  // Add spacing between the user ID and the title
+                        Text(
+                          todo.title,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: todo.completed ? Colors.green[800] : Colors.red[800],
+                          ),
+                        ),
+                      ],
+                    ),
                     trailing: Icon(
                       todo.completed ? Icons.check_circle : Icons.cancel,
-                      color: todo.completed ? Colors.green : Colors.red,
+                      color: todo.completed ? Colors.green[600] : Colors.red[600],
+                      size: 28,  // Icon size for better visibility
                     ),
                   ),
                 );
