@@ -1,0 +1,118 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(const Todos());
+}
+
+class Todos extends StatelessWidget {
+  const Todos({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Todo List',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const TodoList(title: 'Todos'),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class TodoList extends StatefulWidget {
+  const TodoList({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<TodoList> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<TodoList> {
+  late Future<List<Todo>> todos;
+
+  @override
+  void initState() {
+    super.initState();
+    todos = getTodos(); // Initialize the Future here
+  }
+
+  Future<List<Todo>> getTodos() async {
+    String _url = 'https://jsonplaceholder.typicode.com/todos';
+    final response = await http.get(Uri.parse(_url));
+
+    if (response.statusCode == 200) {
+      final List jsonData = json.decode(response.body);
+      return jsonData.map((e) => Todo.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to Load data');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: FutureBuilder<List<Todo>>(
+        future: todos, // Pass the future directly here
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No Todos Available'));
+          } else {
+            List<Todo> todos = snapshot.data!; // Extract data from snapshot
+            return ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                Todo todo = todos[index];
+                return Card(
+                  color: todo.completed ? Colors.green[100] : Colors.red[100],
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  child: ListTile(
+                    title: Text(todo.title),
+                    subtitle: Text('User ID: ${todo.userId}'),
+                    trailing: Icon(
+                      todo.completed ? Icons.check_circle : Icons.cancel,
+                      color: todo.completed ? Colors.green : Colors.red,
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+class Todo {
+  final int userId;
+  final String title;
+  final bool completed;
+
+  Todo({
+    required this.userId,
+    required this.title,
+    required this.completed,
+  });
+
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(
+      userId: json['userId'],
+      title: json['title'],
+      completed: json['completed'],
+    );
+  }
+}
